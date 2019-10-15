@@ -19,7 +19,7 @@ const char* Ezo_board::get_name(){
 
 void Ezo_board::send_cmd(const char* command) {
   Wire.beginTransmission(this->i2c_address);
-  Wire.write(command); 
+  Wire.write(command);
   Wire.endTransmission();
   this->issued_read = false;
 }
@@ -42,10 +42,10 @@ void Ezo_board::send_read_with_temp_comp(float temperature){
 
 
 enum Ezo_board::errors Ezo_board::receive_read_cmd(){
-	
+
 	char _sensordata[this->bufferlen];
 	this->error = receive_cmd(_sensordata, bufferlen);
-	
+
 	if(this->error == SUCCESS){
 		if(this->issued_read == false){
 			this->error = NOT_READ_CMD;
@@ -61,7 +61,7 @@ bool Ezo_board::is_read_poll(){
 	return this->issued_read;
 }
 
-float Ezo_board:: get_last_received_reading(){  
+float Ezo_board:: get_last_received_reading(){
 	return this->reading;
 }
 
@@ -92,7 +92,7 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
       sensor_bytes_received++;
     }
   }
-  
+
   //should last array point be set to 0 to stop string overflows?
   switch (code) {
     case 1:
@@ -112,5 +112,5 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
 	  break;
   }
   return this->error;
-  
+
 }
