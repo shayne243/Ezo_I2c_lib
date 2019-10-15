@@ -38,8 +38,8 @@ class Ezo_board{
 	enum errors {EZO_SUCCESS, EZO_FAIL, EZO_NOT_READY, EZO_NO_DATA, EZO_NOT_READ_CMD};
 
 	//constructors
-	Ezo_board(uint8_t address);	 //Takes I2C address of the device
-	Ezo_board(uint8_t address, const char* name); //Takes I2C address of the device
+	Ezo_board(TwoWire * wire, uint8_t address);	 //Takes I2C address of the device
+	Ezo_board(TwoWire * wire, uint8_t address, const char* name); //Takes I2C address of the device
 												//as well a name of your choice
 
 	void set_wire(TwoWire wire);
@@ -87,13 +87,13 @@ class Ezo_board{
 	//used to check the validity of the data returned by get_reading()
 
 	protected:
+	TwoWire * wire;
 	uint8_t i2c_address;
 	const char* name = 0;
 	float reading = 0;
 	bool issued_read = false;
 	enum errors error;
 	const static uint8_t bufferlen = 32;
-	TwoWire wire;
 };
 
 

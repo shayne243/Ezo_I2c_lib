@@ -4,11 +4,13 @@
 #include "Wire.h"
 #include <stdlib.h>
 
-Ezo_board::Ezo_board(uint8_t address){
+Ezo_board::Ezo_board(TwoWire * wire, uint8_t address){
+	this->wire = wire;
 	this->i2c_address = address;
 }
 
-Ezo_board::Ezo_board(uint8_t address, const char* name){
+Ezo_board::Ezo_board(TwoWire * wire, uint8_t address, const char* name){
+	this->wire = wire;
 	this->i2c_address = address;
 	this->name = name;
 }
@@ -18,9 +20,10 @@ const char* Ezo_board::get_name(){
 }
 
 void Ezo_board::send_cmd(const char* command) {
-  Wire.beginTransmission(this->i2c_address);
-  Wire.write(command);
-  Wire.endTransmission();
+  this->wire->beginTransmission(this->i2c_address);
+
+  this->wire->write((char*) command);
+  this->wire->endTransmission();
   this->issued_read = false;
 }
 
@@ -46,9 +49,9 @@ enum Ezo_board::errors Ezo_board::receive_read_cmd(){
 	char _sensordata[this->bufferlen];
 	this->error = receive_cmd(_sensordata, bufferlen);
 
-	if(this->error == SUCCESS){
+	if(this->error == EZO_SUCCESS){
 		if(this->issued_read == false){
-			this->error = NOT_READ_CMD;
+			this->error = EZO_NOT_READ_CMD;
 		}
 		else{
 			this->reading = atof(_sensordata);
@@ -76,12 +79,12 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
 
   memset(sensordata_buffer, 0, buffer_len);        // clear sensordata array;
 
-  Wire.requestFrom(this->i2c_address, (uint8_t)(buffer_len-1), (uint8_t)1);
-  code = Wire.read();
+  this->wire->requestFrom(this->i2c_address, (uint8_t)(buffer_len-1));
+  code = this->wire->read();
 
   //Wire.beginTransmission(this->i2c_address);
-  while (Wire.available()) {
-    in_char = Wire.read();
+  while (this->wire->available()) {
+    in_char = this->wire->read();
 
     if (in_char == 0) {
       //Wire.endTransmission();
@@ -96,19 +99,19 @@ enum Ezo_board::errors Ezo_board::receive_cmd( char * sensordata_buffer, uint8_t
   //should last array point be set to 0 to stop string overflows?
   switch (code) {
     case 1:
-	  this->error = SUCCESS;
+	  this->error = EZO_SUCCESS;
       break;
 
     case 2:
-	  this->error = FAIL;
+	  this->error = EZO_FAIL;
       break;
 
     case 254:
-	  this->error = NOT_READY;
+	  this->error = EZO_NOT_READY;
       break;
 
     case 255:
-	  this->error = NO_DATA;
+	  this->error = EZO_NO_DATA;
 	  break;
   }
   return this->error;
