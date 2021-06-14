@@ -66,7 +66,7 @@ class Ezo_board{
 	//Buffer should be long enough to hold the longest command
 	//you'll receive. We recommand 32 bytes/chars as a default
 
-	enum errors receive_read_cmd();
+	char* receive_read_cmd(int* error);
 	//gets the read response from the device, and parses it into the reading variable
 	//if send_read() wasn't used to send the "R" command and issued_read() isnt set, the function will
 	//return the "NOT_READ_CMD" error

@@ -44,7 +44,7 @@ void Ezo_board::send_read_with_temp_comp(float temperature){
 }
 
 
-enum Ezo_board::errors Ezo_board::receive_read_cmd(){
+char * Ezo_board::receive_read_cmd(int * error){
 
 	char _sensordata[this->bufferlen];
 	this->error = receive_cmd(_sensordata, bufferlen);
@@ -57,7 +57,8 @@ enum Ezo_board::errors Ezo_board::receive_read_cmd(){
 			this->reading = atof(_sensordata);
 		}
 	}
-	return this->error;
+  *error = this->error;
+	return _sensordata;
 }
 
 bool Ezo_board::is_read_poll(){
